@@ -4,6 +4,7 @@ require 'rails'
 require 'json'
 require 'rubygems'
 require 'httparty'
+require 'nokogiri'
 
 
 url = "https://xz.aliyun.com/"
@@ -23,8 +24,22 @@ headers = {
   'Sec-Fetch-Use': '?1'
 }
 
-response = HTTParty.get url, headers: headers #{"User-Agent" => APPLICATION_NAME}
-puts "===response.body, #{response.body}"
-puts "===response.code, #{response.code}"
-puts "===response.headers #{response.headers}"
+response = HTTParty.get url, :headers => headers
+puts "===response.code, #{response.code} ===response.headers is #{response.headers}"
+doc = Nokogiri::HTML(response.body)
 
+puts "=== doc is #{doc}"
+
+doc.css('p[class="topic-summary"] a').each do |title|
+  puts "=== title is #{title}"
+  blog_url = "#{url}#{title["href"]}" rescue ''
+  puts "== blog_url is #{blog_url}"
+  blog_title = title.text rescue ''
+  puts "=== blog_title is #{blog_title}"
+end
+
+doc.css('p[class="topic-info"] a')[0].each do |user|
+
+  blog_author = user.text rescue ''
+  puts "=== user is #{user} blog_author is #{blog_author}"
+end
