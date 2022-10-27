@@ -1,0 +1,14 @@
+<script src="//cdn.ckeditor.com/4.18.0/standard/ckeditor.js"></script>
+<div class="blog-edit-container">
+  <%= form_for @blog do |form| %>
+    <div class="">
+      标题:
+      <%= form.text_field :title, class: 'form-control' %>
+    </div>
+    <div id="editor">
+      内容:
+      <%= form.cktext_area :content, style: 'height: 571px;' %>
+    </div>
+    <%= form.submit "发布文章", class: 'btn btn-primary btn-sm' %>
+  <% end %>
+</div>

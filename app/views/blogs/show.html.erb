@@ -1,0 +1,26 @@
+<div class="blog-content">
+  <%= link_to raw('编辑&gt;&gt;'), edit_blog_path(@blog), class: 'detail1' %>
+  <h3>
+    <%= @blog.title %>
+  </h3>
+  <div class="date">
+    <%= @blog.created_at.strftime('%Y-%m-%d %I:%M%p') %>
+  </div>
+  <div class="detail-content">
+    <%= raw(@blog.content) %>
+  </div>
+  <%= link_to raw('&lt;&lt;返回'), blogs_path, class: 'detail1'%>
+</div>
+<style>
+.hljs {
+  *! background: #fff !important;
+}
+.content {
+  height: 100%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  background-attachment: fixed;
+  overflow: auto;
+}
+</style>
