@@ -9,6 +9,7 @@ require 'nokogiri'
 i = 1
 loop do
   url = "https://xz.aliyun.com/?page=#{i}"
+  xz_url = "https://xz.aliyun.com"
   Rails.logger.info "===#{url}"
   headers = {
     'Host': 'xz.aliyun.com',
@@ -28,26 +29,27 @@ loop do
   response = HTTParty.get url, :headers => headers
   puts "===response.code, #{response.code} ===response.headers is #{response.headers}"
   doc = Nokogiri::HTML(response.body)
-
   puts "=== doc is #{doc}"
-
   doc.css('p[class="topic-summary"] a').each do |title|
     puts "=== title is #{title}"
-    blog_url = "#{url}#{title["href"]}" rescue ''
+    blog_url = "#{xz_url}#{title["href"]}" rescue ''
     puts "== blog_url is #{blog_url}"
 
     blog_title = title.text rescue ''
     puts "=== blog_title is #{blog_title}"
+    if blog_title != ''
+      Blog.create title: blog_title.strip, blog_url: blog_url
+    end
+    puts "== blog.all.size #{Blog.all.size}"
   end
 
-  doc.css('p[class="topic-info"] a').each do |user|
-
-    blog_author = user.text rescue ''
-    puts "=== user is #{user} blog_author is #{blog_author}"
-  end
+  #doc.css('p[class="topic-info"] a').each do |user|
+  #  blog_author = user.text rescue ''
+  #  puts "=== user is #{user} blog_author is #{blog_author}"
+  #end
   i = i + 1
-  sleep 20
-  puts "=====i is #{i} sleep 20"
+  sleep 30
+  puts "=====i is #{i} sleep 30"
   if i > 10
     puts "=== end "
     break
