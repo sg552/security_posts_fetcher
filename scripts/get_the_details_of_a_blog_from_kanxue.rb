@@ -9,7 +9,7 @@ require 'nokogiri'
 
 blogs = Blog.all
 blogs.each do |blog|
-  if blog.content.blank?
+  if blog.content.blank? && blog.blog_url.include?('article')
     puts "== blog.inspect #{blog.inspect}"
     kanxue_url = "https://www.kanxue.com/"
     puts "=== blog.blog_url : #{blog.blog_url}"
@@ -41,7 +41,7 @@ blogs.each do |blog|
     to_get_titile = doc.css('h3[class="break-all subject m-0"]').text.strip rescue ''
     puts "=== to_get_titile is #{to_get_titile}"
 
-    to_get_content = doc.css("div[class='message ']") rescue ''
+    to_get_content = doc.css('div[isfirst="1"]') rescue ''
     puts "==  to_get_content is #{to_get_content}"
     images = doc.css("div[class='message '] img") rescue ''
     puts "=== images is #{images}"
@@ -65,6 +65,7 @@ blogs.each do |blog|
     author = to_get_author.split('=').last
     puts "=== username is #{username} author: #{author}"
     blog.update author: author, content: blog_content
+    puts "==== blog: #{blog.inspect}"
     puts '===start 30'
     sleep 30
     puts '==end 30'
