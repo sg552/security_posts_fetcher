@@ -34,10 +34,10 @@
             <%= blog.author %>
           </td>
           <td>
-            <%= blog.source_website %>
+            <%= blog.category.try(:name) rescue ''%>
           </td>
           <td>
-            <%= blog.views %>
+            <%= blog.source_website %>
           </td>
           <td>
             <%= blog.created_at.strftime('%Y-%m-%d %I:%M%p') %>
