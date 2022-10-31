@@ -1,33 +1,56 @@
-<div class="container-right">
+<div class="container">
   <div class="blog">
     <h3>博客</h3>
     <p>博客总数: <%= @total_count %></p>
     <%= paginate @blogs %>
     <%= link_to "新建", new_blog_path %><br/>
     <%= form_tag '', method: :get do %>
-        标题:
-        <%= text_field_tag :blog_title, params[:blog_title] %>
-        内容:
-        <%= text_field_tag :blog_content, params[:blog_content] %>
+      标题:
+      <%= text_field_tag :blog_title, params[:blog_title] %>
+      内容:
+      <%= text_field_tag :blog_content, params[:blog_content] %>
       <%= submit_tag raw("&#xf002; 查询"), class: "form_submit", class: 'btn btn-secondary btn-sm fa-input' %>
     <% end %>
-    <% @blogs.each do |blog| %>
-      <div class="each-blog">
-        <div class="title">
-          <%= blog.title %>
-        </div>
-        <div class="date">
-          <%#= blog.created_at.strftime('%Y-%m-%d %I:%M%p') %>
-        </div>
-        <div class="desc">
-          <%= raw blog.content %>
-        </div>
-        <div>
-          <a href="/blogs/<%= blog.id %>" class="detail">查看全文&gt;&gt; </a>
-          <%= link_to raw("编辑&gt;&gt;"), edit_blog_path(:id => blog.id), class: 'detail1' %>
-          <%= link_to "删除",blog,:method => :delete %>
-        </div>
-      </div>
-    <% end %>
+    <table class="table table-striped table-bordered">
+      <tr>
+        <th>ID</th>
+        <th>标题</th>
+        <th>作者</th>
+        <th>分类</th>
+        <th>来源</th>
+        <th>创建时间</th>
+        <th>浏览次数</th>
+        <th style='width: 80px;'>操作</th>
+      </tr>
+      <% @blogs.each do |blog| %>
+        <tr>
+          <td>
+            <%= blog.id %>
+          </td>
+          <td>
+            <%= blog.title %>
+          </td>
+          <td>
+            <%= blog.author %>
+          </td>
+          <td>
+            <%= blog.source_website %>
+          </td>
+          <td>
+            <%= blog.views %>
+          </td>
+          <td>
+            <%= blog.created_at.strftime('%Y-%m-%d %I:%M%p') %>
+          </td>
+          <td>
+            <%= blog.views %>
+          </td>
+          <td>
+            <a href="/blogs/<%= blog.id %>">详情</a>
+          </td>
+        </tr>
+      <% end %>
+    </table>
   </div>
+  <%= paginate @blogs %>
 </div>
