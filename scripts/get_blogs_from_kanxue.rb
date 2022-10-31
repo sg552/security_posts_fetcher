@@ -6,6 +6,7 @@ require 'rubygems'
 require 'httparty'
 require 'nokogiri'
 
+@logger = Logger.new("#{Rails.root}/log/get_blogs_from_kanxue.log")
 url = "https://www.kanxue.com/"
 kanxue_url = "www.kanxue.com"
 post_html = "/homepost-morearticle.htm"
@@ -27,22 +28,22 @@ headers = {
 }
 
 response = HTTParty.get url, :headers => headers
-puts "===response.code, #{response.code} ===response.headers is #{response.headers}"
+@logger.info "===response.code, #{response.code} ===response.headers is #{response.headers}"
 doc = Nokogiri::HTML(response.body)
-puts "=== doc is #{doc}"
+@logger.info "=== doc is #{doc}"
 doc.css('div[class="media-body position-relative"] a').each do |title|
-  puts "=== title is #{title}"
+  @logger.info "=== title is #{title}"
   temp_blog_url = title["href"]
   temp_blog_title = title["title"]
-  puts "== temp_blog_title is #{temp_blog_title}"
-  puts "== temp_blog_url is #{temp_blog_url}"
+  @logger.info "== temp_blog_title is #{temp_blog_title}"
+  @logger.info "== temp_blog_url is #{temp_blog_url}"
   blog_url = ''
   if temp_blog_url.include? 'https:' || 'http'
-    puts blog_title
-    puts "== include= blog_url is #{blog_url}"
+    @logger.info blog_title
+    @logger.info "== include= blog_url is #{blog_url}"
   else
     blog_url = "https:#{temp_blog_url}"
-    puts "=else= blog_url is #{blog_url}"
+    @logger.info "=else= blog_url is #{blog_url}"
   end
 
   blog = Blog.where('blog_url = ?', blog_url).first
@@ -54,4 +55,4 @@ doc.css('div[class="media-body position-relative"] a').each do |title|
     end
   end
 end
-puts "== blog.all.size #{Blog.all.size}"
+@logger.info "== blog.all.size #{Blog.all.size}"

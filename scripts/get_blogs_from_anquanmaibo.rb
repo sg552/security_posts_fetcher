@@ -6,6 +6,7 @@ require 'rubygems'
 require 'httparty'
 require 'nokogiri'
 
+@logger = Logger.new("#{Rails.root}/log/get_blogs_from_anquanmaibo.log")
 i = 1
 loop do
   url = "https://www.secpulse.com/page/#{i}"
@@ -30,39 +31,39 @@ loop do
   }
 
   response = HTTParty.get url, :headers => headers
-  puts "===response.code, #{response.code} ===response.headers is #{response.headers}"
+  @logger.info "===response.code, #{response.code} ===response.headers is #{response.headers}"
   doc = Nokogiri::HTML(response.body)
-  puts "=== doc is #{doc}"
+  @logger.info "=== doc is #{doc}"
   doc.css('div#ajax_content li').each do |title|
-    puts "=== title is #{title}"
+    @logger.info "=== title is #{title}"
     #title  url
     temp_blog_url = title.css('div[class="slide #d9534f"] a')[0]["href"] rescue ''
     temp_blog_title = title.css('div[class="slide_text fl"] a')[0].text rescue ''
-    puts "== temp_blog_title is #{temp_blog_title}"
-    puts "== temp_blog_url is #{temp_blog_url}"
+    @logger.info "== temp_blog_title is #{temp_blog_title}"
+    @logger.info "== temp_blog_url is #{temp_blog_url}"
     #封面
     image_url = title.css('div[class="slide #d9534f"] img')[0]["src"] rescue ''
-    puts "== image_url is #{image_url}"
+    @logger.info "== image_url is #{image_url}"
 
     temp_image_name_local = image_url.sub('https://secpulseoss.oss-cn-shanghai.aliyuncs.com/wp-content/uploads/', '') rescue ''
     image_name_local = temp_image_name_local.gsub('/', '_') rescue ''
-    puts "=== image_name_local is #{image_name_local}"
+    @logger.info "=== image_name_local is #{image_name_local}"
     `wget -cO - "#{image_url}" > "public/blog_images/#{image_name_local}"`
     image_url_local = "###MY_IMAGE_SITE###/images/#{image_name_local}"
 
     blog = Blog.where('blog_url = ?', temp_blog_url).first
-    puts "===before save blog: #{blog.inspect}"
+    @logger.info "===before save blog: #{blog.inspect}"
     if blog == nil
       Blog.create title: temp_blog_title.strip, blog_url: temp_blog_url, image_url: image_url_local
-      puts "=== after save blog: #{blog.inspect}"
+      @logger.info "=== after save blog: #{blog.inspect}"
     end
   end
-  puts "== blog.all.size #{Blog.all.size}"
+  @logger.info "== blog.all.size #{Blog.all.size}"
   i = i + 1
   if i > 10
-    puts "=== i is #{i} end"
+    @logger.info "=== i is #{i} end"
     break
   end
-  puts "=== i is #{i} start sleep 10"
+  @logger.info "=== i is #{i} start sleep 10"
   sleep 10
 end

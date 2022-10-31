@@ -7,12 +7,13 @@ require 'rubygems'
 require 'httparty'
 require 'nokogiri'
 
+@logger = Logger.new("#{Rails.root}/log/get_the_details_of_a_blog_from_kanxue.log")
 blogs = Blog.all
 blogs.each do |blog|
-  if blog.content.blank? && blog.blog_url.include?('article')
-    puts "== blog.inspect #{blog.inspect}"
+  if blog.content.blank? && blog.blog_url.include?('article') && blog.blog_url.include?('kanxue')
+    @logger.info "== blog.inspect #{blog.inspect}"
     kanxue_url = "https://www.kanxue.com/"
-    puts "=== blog.blog_url : #{blog.blog_url}"
+    @logger.info "=== blog.blog_url : #{blog.blog_url}"
     headers = {
       'Host': 'bbs.pediy.com',
       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0',
@@ -30,44 +31,44 @@ blogs.each do |blog|
     if blog.blog_url.include? 'https:http'
       new_blog_url = blog.blog_url.sub("https:", '')
       blog.update blog_url: new_blog_url
-      puts "=== blog: #{blog.inspect}"
+      @logger.info "=== blog: #{blog.inspect}"
     end
 
     response = HTTParty.get blog.blog_url, :headers => headers
-    puts "===response.code, #{response.code} === response.headers is #{response.headers}"
+    @logger.info "===response.code, #{response.code} === response.headers is #{response.headers}"
     doc = Nokogiri::HTML(response.body)
-    puts "=== doc is #{doc} doc.class#{doc.class}"
+    @logger.info "=== doc is #{doc} doc.class#{doc.class}"
 
     to_get_titile = doc.css('h3[class="break-all subject m-0"]').text.strip rescue ''
-    puts "=== to_get_titile is #{to_get_titile}"
+    @logger.info "=== to_get_titile is #{to_get_titile}"
 
     to_get_content = doc.css('div[isfirst="1"]') rescue ''
-    puts "==  to_get_content is #{to_get_content}"
+    @logger.info "==  to_get_content is #{to_get_content}"
     images = doc.css("div[class='message '] img") rescue ''
-    puts "=== images is #{images}"
+    @logger.info "=== images is #{images}"
     blog_content = ''
     if images != ''
       images.to_ary.each do |image|
-        puts "=== image is #{image}"
+        @logger.info "=== image is #{image}"
         image_src = image.attr("src") rescue ''
-        puts "--- image_src is #{image_src} "
+        @logger.info "--- image_src is #{image_src} "
         image_name = image_src.sub('upload/attach/202210/', '') rescue ''
-        puts "=== image_src_sub is #{image_name}"
+        @logger.info "=== image_src_sub is #{image_name}"
         `wget -cO - "https://bbs.pediy.com/#{image_src}" > "public/blog_images/#{image_name}"`
-        puts "=== blog_content is #{blog_content}"
+        @logger.info "=== blog_content is #{blog_content}"
       end
     end
     blog_content = to_get_content.to_s.gsub("/upload/attach/202210/", "###MY_IMAGE_SITE###/images/")
-    puts "=== blog_content is #{blog_content}"
+    @logger.info "=== blog_content is #{blog_content}"
 
     username = doc.css('a[class="btn bg-white w-100 py-1"]') rescue ''
     to_get_author = username[0]["href"] rescue ''
     author = to_get_author.split('=').last
-    puts "=== username is #{username} author: #{author}"
+    @logger.info "=== username is #{username} author: #{author}"
     blog.update author: author, content: blog_content
-    puts "==== blog: #{blog.inspect}"
-    puts '===start 30'
+    @logger.info "=====after update blog: #{blog.inspect}"
+    @logger.info '===start 30'
     sleep 30
-    puts '==end 30'
+    @logger.info '==end 30'
   end
 end
