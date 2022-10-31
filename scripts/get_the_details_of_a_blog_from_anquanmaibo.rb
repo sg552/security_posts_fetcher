@@ -10,7 +10,8 @@ require 'nokogiri'
 @logger = Logger.new("#{Rails.root}/log/get_the_details_of_a_blog_from_anquanmaibo.log")
 blogs = Blog.all
 blogs.each do |blog|
-  if blog.content.blank? && blog.blog_url.include?('secpulse')
+  @logger.info "=== before update blog: #{blog.inspect}"
+  if blog.views.blank? && blog.blog_url.include?('secpulse')
     @logger.info "== blog.inspect #{blog.inspect}"
     headers = {
       'Host': 'www.secpulse.com',
@@ -35,8 +36,12 @@ blogs.each do |blog|
     @logger.info "==== to_get_titile: #{to_get_titile}"
     to_get_author = doc.css('span[class="writer"] a')
     author_url = "#{to_get_author[0]["href"]}"
+    #获得作者
     author = "#{to_get_author[0].text}"
     @logger.info "==== to_get_author : #{to_get_author}==== author_url: #{author_url}==== author: #{author}"
+    created_at = doc.css('div[class="right fr"] span')[0].text
+    views = doc.css('div[class="right fr"] span')[1].text.sub(',', '').to_i
+    @logger.info "==== created_at: #{created_at} views: #{views}"
 
     to_get_content = doc.css('div[class="left-9-code"]') rescue ''
     @logger.info "==  to_get_content is #{to_get_content}"
@@ -47,23 +52,27 @@ blogs.each do |blog|
     if images != ''
       images.to_ary.each do |image|
         @logger.info "=== image is #{image}"
-        #https://secpulseoss.oss-cn-shanghai.aliyuncs.com/wp-content/uploads/1970/01/beepress-image-189910-1666849072.png
         image_src = image.attr("src") rescue ''
         @logger.info "--- image_src is #{image_src} "
         temp_image_name = image_src.sub("#{remote_uploads_url}", '') rescue ''
         image_name = temp_image_name.gsub('/', '_')
         @logger.info "=== image_src_sub is #{image_name}"
         `wget -cO - "#{image_src}" > "public/blog_images/#{image_name}"`
-        @logger.info "=== blog_content is #{blog_content}"
       end
     end
     blog_content = to_get_content.to_s.gsub("#{remote_uploads_url}", "###MY_IMAGE_SITE###/images/")
     @logger.info "=== blog_content is #{blog_content}"
 
-    #username = doc.css('span[class="username cell"]').text
-    #@logger.info "=== username is #{username}"
+    category_name = doc.css('div[class="left fl"] span')[0].css('a').text
+    category_local = Category.where('blog_id = ? and name = ?', blog.id, category_name).first
+    if category_local.blank?
+      Category.create blog_id: blog.id, name: category_name
+    end
+    @logger.info "=== category_name is #{category_name}"
+    puts "=== category_name is #{category_name}"
 
-    #blog.update author: author, author_url: author_url, content: blog_content
+    blog.update author: author, author_url: author_url, content: blog_content, views: views, created_at: created_at
+    @logger.info "=== after update blog: #{blog.inspect}"
     @logger.info '===start 30'
     sleep 30
     @logger.info '==end 30'

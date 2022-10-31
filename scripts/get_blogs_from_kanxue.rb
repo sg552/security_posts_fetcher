@@ -31,28 +31,18 @@ response = HTTParty.get url, :headers => headers
 @logger.info "===response.code, #{response.code} ===response.headers is #{response.headers}"
 doc = Nokogiri::HTML(response.body)
 @logger.info "=== doc is #{doc}"
-doc.css('div[class="media-body position-relative"] a').each do |title|
+doc.css('div[class="media p-4 home_article bg-white"]').each do |title|
   @logger.info "=== title is #{title}"
-  temp_blog_url = title["href"]
-  temp_blog_title = title["title"]
-  @logger.info "== temp_blog_title is #{temp_blog_title}"
-  @logger.info "== temp_blog_url is #{temp_blog_url}"
-  blog_url = ''
-  if temp_blog_url.include? 'https:' || 'http'
-    @logger.info blog_title
-    @logger.info "== include= blog_url is #{blog_url}"
-  else
-    blog_url = "https:#{temp_blog_url}"
-    @logger.info "=else= blog_url is #{blog_url}"
-  end
+  temp_image_url = title.css('div[class="mr-4 article-img"]').to_s.split('url(').last.split(')').first
+  image_url = "https:#{temp_image_url}"
+  blog_title = title.css('h4').text.strip
+  blog_url = title.css('div[class="media-body position-relative"] a')[0]["href"]
+  @logger.info "=== image_url: #{image_url} blog_title #{blog_title} blog_url :#{blog_url}"
 
   blog = Blog.where('blog_url = ?', blog_url).first
   if blog.blank?
-    if temp_blog_title.present?
-      Blog.create title: temp_blog_title.strip, blog_url: blog_url
-    else
-      Blog.create blog_url: blog_url
-    end
+    Blog.create title: blog_title, blog_url: blog_url, image_url: image_url, source_website: 'kanxue'
   end
+
 end
 @logger.info "== blog.all.size #{Blog.all.size}"
