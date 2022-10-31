@@ -10,7 +10,7 @@ require 'nokogiri'
 @logger = Logger.new("#{Rails.root}/log/get_the_detials_of_a_blog_from_xz_aliyun.log")
 blogs = Blog.all
 blogs.each do |blog|
-  if blog.content.blank?
+  if blog.views.blank?
     @logger.info "== blog.inspect #{blog.inspect}"
     xz_aliyun_url = "https://xz.aliyun.com"
     url = "https://xz.aliyun.com/t/11774"
@@ -33,7 +33,7 @@ blogs.each do |blog|
     response = HTTParty.get blog.blog_url, :headers => headers
     @logger.info "===response.code, #{response.code} === response.headers is #{response.headers}"
     doc = Nokogiri::HTML(response.body)
-    @logger.info "=== doc is #{doc} doc.class#{doc.class}"
+    @logger.info "=== doc is #{doc} doc.class: #{doc.class}"
 
     to_get_author = doc.css('span[class="info-left"] a')
     author_url = "#{xz_aliyun_url}#{to_get_author[0]["href"]}"
@@ -42,6 +42,7 @@ blogs.each do |blog|
 
     to_get_content = doc.css('div#topic_content') rescue ''
     @logger.info "==  to_get_content is #{to_get_content}"
+    #获得博客内容的所有图片
     images = doc.css('div#topic_content img') rescue ''
     @logger.info "=== images is #{images}"
     blog_content = ''
@@ -56,13 +57,37 @@ blogs.each do |blog|
         @logger.info "=== blog_content is #{blog_content}"
       end
     end
+    #获得博客的内容
     blog_content = to_get_content.to_s.gsub("https://xzfile.aliyuncs.com/media/upload/picture/", "###MY_IMAGE_SITE###/images/")
     @logger.info "=== blog_content is #{blog_content}"
 
     username = doc.css('span[class="username cell"]').text
     @logger.info "=== username is #{username}"
 
-    blog.update author: username, content: blog_content
+    to_get_created_at = doc.css('span[class="info-left"] span')
+    temp_to_get_created_at = doc.css('span[class="info-left"] span')[5]
+    #获得浏览数
+    views = doc.css('span[class="info-left"] span')[5].text.split('浏览数').last
+    #获得创建时间
+    created_at = doc.css('span[class="info-left"] span')[2].text
+    @logger.info "==  to_get_created_at is #{to_get_created_at}"
+    @logger.info "==  views : #{views.to_i}  created_at : #{created_at}"
+
+    to_get_category = doc.css('span[class="content-node"] a').each do |a|
+      category_name  = a.text
+      @logger.info "==  category_name : #{category_name}"
+      category = Category.where('name = ? and blog_id = ?', category, blog.id).first
+      if category.blank?
+        Category.create name: category, blog_id: blog.id
+      end
+      @logger.info "==  category: #{category.inspect}"
+      puts "==  category: #{category.inspect}"
+    end
+    @logger.info "==  to_get_category: #{to_get_category}"
+    puts "==  to_get_category: #{to_get_category}"
+
+    blog.update author: username, content: blog_content, source_website: 'xianzhi',created_at: created_at, source_website: 'xianzhi', views: views.to_i
+
     @logger.info '===start 30'
     sleep 30
     @logger.info '==end 30'
