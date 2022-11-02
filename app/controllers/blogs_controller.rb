@@ -5,6 +5,7 @@ class BlogsController < ApplicationController
     @blogs = Blog.all
     @blogs = @blogs.where('content like ?', "%#{params[:blog_content]}%") if params[:blog_content].present?
     @blogs = @blogs.where('title like ?', "%#{params[:blog_title]}%") if params[:blog_title].present?
+    @blogs = @blogs.where('source_website like ?', "%#{params[:blog_source_website]}%") if params[:blog_source_website].present?
     @total_count = @blogs.all.size
     @blogs = @blogs.order('id desc').page(params[:page]).per(100)
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_10_31_020636) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_01_024636) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -30,6 +30,14 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_31_020636) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.integer "blog_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "special_column_id"
+  end
+
+  create_table "special_columns", force: :cascade do |t|
+    t.string "name"
+    t.string "source_website"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
