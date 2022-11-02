@@ -54,7 +54,7 @@ loop do
     blog = Blog.where('blog_url = ?', temp_blog_url).first
     @logger.info "===before save blog: #{blog.inspect}"
     if blog == nil
-      Blog.create title: temp_blog_title.strip, blog_url: temp_blog_url, image_url: image_url_local
+      Blog.create title: temp_blog_title.strip, blog_url: temp_blog_url, image_url: image_url_local, resource_website: 'anquanmaibo'
       @logger.info "=== after save blog: #{blog.inspect}"
     end
   end

@@ -19,11 +19,11 @@ loop do
     'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
     'Accept-Encoding': 'gzip, deflate, br',
     'Connection': 'keep-alive',
-    'Cookie': 'cna=RVW0Gru+SF8CAbf+PUgM1No+; isg=BEdHq6Tn6Ie02G3OWVXr83B71fIRTBsuiRDlFRk0Y1b9iGdKIRyrfoVJKsjWe_Om; tfstk=caTFBI21CoU6APLNlNbyuurAAnQdZJdHZP5fxYv_MbRTH9sGixyRs921__NaEMf..; l=eBQbNcplL4_DN0VYBOfahurza77OSIOYYuPzaNbMiOCPOXfp5o2GW6y16bT9C31Vh6xvR35fl999BeYBYQd-nxvTkjOadJMmn; t=7a2881edec39e7fbff8a76ef506ff586; aliyun_choice=CN; currentRegionId=cn-hangzhou; login_aliyunid_pk=1387746726135732; aliyun_lang=zh; aliyun_country=CN; aliyun_site=CN; login_aliyunid_csrf=_csrf_tk_1133266830721115; _samesite_flag_=true; cookie2=1e17b3ab40e7857adf07c6459ec22c50; _tb_token_=586ee33685aed',
+    'Cookie': 'cna=RVW0Gru+SF8CAbf+PUgM1No+; isg=BFtbblO4vLmFnsEKbfmff_yf6bbFMG8ylXRJUU2YN9pxLHsO1QD_gnmtxgyiF8cq; tfstk=c6s1BgYekLAUmYOElCwUgm9XH3KAC9kWhPOGC5gTpd9UD7e2801D80RWhSQmMnJvd; l=eBQbNcplL4_DNoYTBOfahurza77OSIOYYuPzaNbMiOCPOJ1B54aVW6yGZuY6C31Vh6f2R35fl999BeYBYQd-nxvtGwBLE8Dmn; t=7a2881edec39e7fbff8a76ef506ff586; aliyun_choice=CN; currentRegionId=cn-hangzhou; login_aliyunid_pk=1387746726135732; aliyun_lang=zh; csrftoken=K4A139LURfgcaGcrq6WrjliBOy1CKCSpvTROW1dQLG8mWVfc2HThwMItIDs6t9mE; aliyun_country=CN; aliyun_site=CN; acw_tc=2f624a4816672956703872149e29c8f8729c03ea7d1e824af4b95e67e2362d; acw_sc__v2=6360e9be832b995754c58b7a9f724516fd15cd23',
     'Upgrade-Insecure-Request': '1',
     'Sec-Fetch-Des': 'document',
     'Sec-Fetch-Mod': 'navigate',
-    'Sec-Fetch-Sit': 'cross-site',
+    'Sec-Fetch-Site': 'same-origin',
     'Sec-Fetch-Use': '?1'
   }
 
@@ -39,15 +39,11 @@ loop do
     blog_title = title.text rescue ''
     @logger.info "=== blog_title is #{blog_title}"
     if blog_title != ''
-      Blog.create title: blog_title.strip, blog_url: blog_url
+      Blog.create title: blog_title.strip, blog_url: blog_url, source_website: 'xianzhi'
     end
     @logger.info "== blog.all.size #{Blog.all.size}"
   end
 
-  #doc.css('p[class="topic-info"] a').each do |user|
-  #  blog_author = user.text rescue ''
-  #  @logger.info "=== user is #{user} blog_author is #{blog_author}"
-  #end
   i = i + 1
   sleep 30
   @logger.info "=====i is #{i} sleep 30"
