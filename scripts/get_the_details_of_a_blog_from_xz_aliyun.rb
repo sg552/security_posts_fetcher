@@ -85,8 +85,8 @@ blogs.each do |blog|
       category_name  = a.text
       @logger.info "==  category_name : #{category_name}"
       category = Category.where('name = ? and blog_id = ?', category, blog.id).first
-      xianzhi_anquanjishu_column = ["众测渗透", "漏洞分析", "WEB安全", "二进制安全", "移动安全", "IoT安全", "企业安全", "区块链安全", "密码学", "CTF", "安全工具", "资源分享", "技术讨论"].to_s
-      xianzhi_qingbao_column = ["情报"].to_s
+      xianzhi_anquanjishu_column = ["安全技术", "众测渗透", "漏洞分析", "WEB安全", "二进制安全", "移动安全", "IoT安全", "企业安全", "区块链安全", "密码学", "CTF", "安全工具", "资源分享", "技术讨论"].to_s
+      xianzhi_qingbao_column = ["情报", "先知情报"].to_s
       xianzhi_gonggao_column = ["社区公告"].to_s
       if xianzhi_anquanjishu_column.include?category_name
         special_column_local = SpecialColumn.where('name = ? and source_website = ?', "安全技术", 'xianzhi').first
