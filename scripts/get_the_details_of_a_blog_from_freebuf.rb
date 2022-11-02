@@ -7,7 +7,7 @@ require 'rubygems'
 require 'httparty'
 require 'nokogiri'
 
-@logger = Logger.new("#{Rails.root}/log/get_blogs_freebuf.log")
+@logger = Logger.new("#{Rails.root}/log/get_blogs_from_freebuf.log")
 blogs = Blog.where('source_website = ?', 'freebuf').all
 blogs.each do |blog|
   @logger.info "== blog.inspect #{blog.inspect}"
@@ -32,6 +32,19 @@ blogs.each do |blog|
   doc = Nokogiri::HTML(response.body)
   @logger.info "=== doc is #{doc} doc.class: #{doc.class}"
 
+  special_column_name = doc.css('li[class="tab active"] a').text
+  special_column_local = SpecialColumn.where('name = ? and source_website = ?', special_column_name, 'freebuf').first
+  @logger.info "=== special_column_name :#{special_column_name} special_column_local:#{special_column_local.inspect}"
+  if special_column_local.blank?
+    special_column_local = SpecialColumn.create name: special_column_name, source_website: 'freebuf'
+    @logger.info "===local create special_columns:#{special_column_local.inspect}"
+  end
+  doc.css('span[class="txt"]').each do |to_get_category_name|
+    category_name = to_get_category_name.text.sub('#', '')
+    @logger.info "=== category_name #{category_name}"
+    Category.create name: category_name, blog_id: blog.id, special_column_id: special_column_local.id
+    @logger.info "=== category size:#{Category.all.size}"
+  end
 
   to_get_content = doc.css('div[class="artical-body"]') rescue ''
   @logger.info "==  to_get_content is #{to_get_content}"
