@@ -1,24 +1,17 @@
-# README
+### 抓取先知的博客
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+步骤
 
-Things you may want to cover:
+（1）创建专栏的数据
+    `$ bundle exec ruby scripts/create_special_column.rb`
 
-* Ruby version
+（2）创建可以使用的代理
+    `$ bundle exec ruby scripts/create_proxies.rb`
 
-* System dependencies
+（3）创建保存图片的文件夹
+    `mkdir public/blog_images/`
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+（4）使用代理抓取博客列表和详情页面
+     1. 修改run.rb 的内容，并运行
+     $ bundle exec ruby run.rb
+     2. 复制输出的命令，在命令行执行

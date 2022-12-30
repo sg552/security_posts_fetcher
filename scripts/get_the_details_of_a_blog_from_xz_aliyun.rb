@@ -81,24 +81,26 @@ blogs.each do |blog|
   @logger.info "==  views : #{views}  created_at : #{created_at}"
 
   to_get_category = doc.css('span[class="content-node"] a').each do |a|
-    category_name  = a.text
+    category_name  = a.text rescue ''
     @logger.info "==  category_name : #{category_name}"
-    category = Category.where('name = ? and blog_id = ?', category, blog.id).first
-    xianzhi_anquanjishu_column = ["安全技术", "众测渗透", "漏洞分析", "WEB安全", "二进制安全", "移动安全", "IoT安全", "企业安全", "区块链安全", "密码学", "CTF", "安全工具", "资源分享", "技术讨论"].to_s
-    xianzhi_qingbao_column = ["情报", "先知情报"].to_s
-    xianzhi_gonggao_column = ["社区公告"].to_s
-    if xianzhi_anquanjishu_column.include?category_name
-      special_column_local = SpecialColumn.where('name = ? and source_website = ?', "安全技术", 'xianzhi').first
-    elsif xianzhi_qingbao_column.include?category_name
-      special_column_local = SpecialColumn.where('name = ? and source_website = ?', "先知情报", 'xianzhi').first
-    elsif xianzhi_gonggao_column.include?category_name
-      special_column_local = SpecialColumn.where('name = ? and source_website = ?', "社区公告", 'xianzhi').first
+    if category_name.present?
+      category = Category.where('name = ? and blog_id = ?', category_name, blog.id).first
+      xianzhi_anquanjishu_column = ["安全技术", "众测渗透", "漏洞分析", "WEB安全", "二进制安全", "移动安全", "IoT安全", "企业安全", "区块链安全", "密码学", "CTF", "安全工具", "资源分享", "技术讨论"].to_s
+      xianzhi_qingbao_column = ["情报", "先知情报"].to_s
+      xianzhi_gonggao_column = ["社区公告"].to_s
+      if xianzhi_anquanjishu_column.include?category_name
+        special_column_local = SpecialColumn.where('name = ? and source_website = ?', "安全技术", 'xianzhi').first
+      elsif xianzhi_qingbao_column.include?category_name
+        special_column_local = SpecialColumn.where('name = ? and source_website = ?', "先知情报", 'xianzhi').first
+      elsif xianzhi_gonggao_column.include?category_name
+        special_column_local = SpecialColumn.where('name = ? and source_website = ?', "社区公告", 'xianzhi').first
+      end
+      if category.blank?
+        Category.create name: category_name, blog_id: blog.id, special_column_id: special_column_local.id
+      end
+      @logger.info "==  category: #{category.inspect}"
+      puts "==  category: #{category.inspect}"
     end
-    if category.blank?
-      Category.create name: category_name, blog_id: blog.id, special_column_id: special_column_local.id
-    end
-    @logger.info "==  category: #{category.inspect}"
-    puts "==  category: #{category.inspect}"
   end
   @logger.info "==  to_get_category: #{to_get_category}"
   blog.update author: username, content: blog_content, created_at: created_at, source_website: 'xianzhi', views: views
