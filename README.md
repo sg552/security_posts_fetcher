@@ -15,3 +15,10 @@
      1. 修改run.rb 的内容，并运行
      $ bundle exec ruby run.rb
      2. 复制输出的命令，在命令行执行
+
+### 抓取看雪的博客
+步骤：
+
+（1）安装playwright
+    `$ npm init playwright@latest`
+    选择JavaScript，然后一直回车即可。

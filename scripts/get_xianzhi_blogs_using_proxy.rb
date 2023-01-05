@@ -11,7 +11,7 @@ Rails.logger = Logger.new("log/get_xianzhi_blogs_using_proxy#{ENV['FROM']}_#{ENV
 SLEEP = 30
 URL = 'https://xz.aliyun.com'
 TIMEOUT = 10
-NUMBER = 3
+NUMBER = 10
 
 def get_proxy_token
   command_get_token = %Q{curl -d "user=bigbanana666&password=bigbanana888" https://dvapi.doveproxy.net/cmapi.php?rq=login}
@@ -45,6 +45,27 @@ def create_proxy
   Proxy.where('expiration_time < ?', Time.now).delete_all
 end
 
+def retry_to_save_image image_src, image_name
+  proxy = use_proxy
+  command_get_image = %Q{curl -s --socks5 #{proxy.ip}:#{proxy.port} #{image_src} --output public/blog_images/#{image_name}}
+end
+
+def retry_three_to_save_image image_src, image_name
+  begin
+    retry_three_to_save_image
+  rescue
+    begin
+      retry_three_to_save_image
+    rescue
+      begin
+        retry_three_to_save_image
+      rescue
+        Rails.logger.info "============ curl image #{image_src} to loacl #{image_name} error"
+      end
+    end
+  end
+end
+
 def save_images images
   image_remote_and_local_hash = {}
   images.to_ary.each do |image|
@@ -58,8 +79,7 @@ def save_images images
     begin
       command_get_image = %Q{curl -s --socks5 #{proxy.ip}:#{proxy.port} #{image_src} --output public/blog_images/#{image_name}}
     rescue
-      proxy = use_proxy
-      command_get_image = %Q{curl -s --socks5 #{proxy.ip}:#{proxy.port} #{image_src} --output public/blog_images/#{image_name}}
+      retry_three_to_save_image image_src, image_name
     end
     Rails.logger.info "======  command_get_image: #{command_get_image}"
     result = `#{command_get_image}`
@@ -144,7 +164,7 @@ def update_blog blog_url, proxy_id
     blog_html_doc = `#{command_get_page}`
     blog_show_doc = Nokogiri::HTML(blog_html_doc)
     to_get_content = blog_show_doc.css('div#topic_content') rescue ''
-    blog_show_doc = retry_three_to_get_blog_show_page if to_get_content.blank?
+    blog_show_doc = retry_three_to_get_blog_show_page blog_url if to_get_content.blank?
     to_get_content = blog_show_doc.css('div#topic_content') rescue ''
     to_get_author = blog_show_doc.css('span[class="info-left"] a')
     author_url = "#{URL}#{to_get_author[0]}"
@@ -193,6 +213,33 @@ def update_blog blog_url, proxy_id
   end
 end
 
+def retry_to_get_list_page xianzhi_url
+  roxy = use_proxy
+  Rails.logger.info "==== proxy ip: #{proxy.external_ip rescue ''}"
+  command_get_page = %Q{curl -s --socks5 #{proxy.ip}:#{proxy.port} #{xianzhi_url}}
+  result = `#{command_get_page}`
+  Rails.logger.info "=== result #{result} command_get_page: #{command_get_page}"
+  doc = Nokogiri::HTML(result)
+  Rails.logger.info "============= doc is #{doc} "
+  list_page_titles = doc.css('p[class="topic-summary"] a')
+  return list_page_titles
+end
+
+def retry_three_to_get_list_page xianzhi_url
+  begin
+    list_page_titles =retry_to_get_list_page xianzhi_url
+  rescue
+    begin
+      list_page_titles =retry_to_get_list_page xianzhi_url
+      begin
+       list_page_titles = retry_to_get_list_page xianzhi_url
+      rescue
+        Rails.logger.info "==== get list page error"
+      end
+    end
+  end
+  return list_page_titles
+end
 
 def run
   (ENV["FROM"].to_i .. ENV["TO"].to_i).each do |i|
@@ -206,6 +253,9 @@ def run
     Rails.logger.info "=== result #{result} command_get_page: #{command_get_page}"
     doc = Nokogiri::HTML(result)
     Rails.logger.info "============= doc is #{doc} "
+    list_page_titles = doc.css('p[class="topic-summary"] a') rescue ''
+    list_page_titles = retry_three_to_get_list_page xianzhi_url if list_page_titles.blank?
+    Rails.logger.info "============= list_page is present"
     doc.css('p[class="topic-summary"] a').each do |title|
       blog_url = "#{URL}#{title["href"]}" rescue ''
       blog_title = title.text rescue ''
@@ -219,11 +269,8 @@ def run
         update_blog blog_url, proxy.id
       end
     end
-
-    Rails.logger.info "=== i: #{i} sleep #{SLEEP}"
-    sleep SLEEP
   end
-  Rails.logger.info "=======#{ENV['FROM']}_#{ENV['TO']}======== end"
+  Rails.logger.info "====after created ===#{ENV['FROM']}_#{ENV['TO']}======== end"
 end
 
 
