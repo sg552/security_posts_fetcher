@@ -17,8 +17,27 @@
      2. 复制输出的命令，在命令行执行
 
 ### 抓取看雪的博客
+
 步骤：
 
 （1）安装playwright
     `$ npm init playwright@latest`
     选择JavaScript，然后一直回车即可。
+    或者使用
+    `$ yarn create playwright`
+    选择JavaScript，然后一直回车即可。
+
+（2）把以下两个脚本进行转移
+     把看雪的脚本放在创建的tests目录下
+    `cp scripts/kanxue.spec.js tests/`
+    把浏览器的配置文件放在项目的根目录下
+    `cp scripts/playwright.config.js .`
+
+（3）把自动生成的example.spec.js文件进行删除
+    `rm tests/example.spec.js`
+
+（4）抓取前n页的博客标题
+    修改tests/kanxue.spec.js 获取页面的博客的标题和链接,运行脚本
+    `bundle exec ruby scripts/get_kanxue_blogs_using_playwright.rb`
+
+
