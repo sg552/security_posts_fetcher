@@ -10,7 +10,7 @@ Rails.logger = Logger.new("log/create_proxies.log")
 
 URL = "https://broker-api.lifeat.cn/user/app/broker/user/brokerUserDetail"
 TIMEOUT = 10
-NUMBER = 3
+NUMBER = 10
 
 def get_proxy_token
   command_get_token = %Q{curl -d "user=bigbanana666&password=bigbanana888" https://dvapi.doveproxy.net/cmapi.php?rq=login}

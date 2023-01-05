@@ -8,7 +8,7 @@ require 'nokogiri'
 
 Rails.logger = Logger.new("log/get_xianzhi_blogs_using_proxy#{ENV['FROM']}_#{ENV['TO']}.log")
 
-SLEEP = 30
+SLEEP = 60
 URL = 'https://xz.aliyun.com'
 TIMEOUT = 10
 NUMBER = 10
@@ -214,7 +214,7 @@ def update_blog blog_url, proxy_id
 end
 
 def retry_to_get_list_page xianzhi_url
-  roxy = use_proxy
+  proxy = use_proxy
   Rails.logger.info "==== proxy ip: #{proxy.external_ip rescue ''}"
   command_get_page = %Q{curl -s --socks5 #{proxy.ip}:#{proxy.port} #{xianzhi_url}}
   result = `#{command_get_page}`
