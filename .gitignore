@@ -6,6 +6,8 @@
 
 # Ignore bundler config.
 /.bundle
+nohup.out
+public/blog_images/*
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -35,6 +37,7 @@ node_modules/
 /test-results/
 /playwright-report/
 /playwright/.cache/
-/test-results/
-/playwright-report/
-/playwright/.cache/
+playwright.config.js
+tests-examples/
+tests/
+

@@ -8,8 +8,18 @@ require 'nokogiri'
 
 Rails.logger = Logger.new("log/get_kanxue_blogs_using_playwright.log")
 
-command = %Q{npx playwright test kanxue --debug}
+file_name = 'tests/kanxue.spec.js'
+text = File.read(file_name)
+new_contents = text.gsub(/page_start/, "#{ENV['PAGE_START']}").gsub(/page_end/, "#{ENV['PAGE_END']}")
+Rails.logger.info new_contents
+new_file = "tests/kanxue_#{ENV['PAGE_START']}_#{ENV['PAGE_END']}.spec.js"
+File.open(new_file, "w+") do |f|
+  f.write(new_contents)
+end
+
+command = %Q{npx playwright test #{new_file} --debug}
 result = `#{command}`
+Rails.logger.info "========== result: #{result}"
 doc = Nokogiri::HTML(result)
 Rails.logger.info "=== doc is #{doc}"
 doc.css('div[class="media p-4 home_article bg-white"]').each do |title|
