@@ -13,7 +13,7 @@
 
 （4）使用代理抓取博客列表和详情页面
      1. 修改run.rb 的内容，并运行
-     $ bundle exec ruby run.rb
+     `$ bundle exec ruby run.rb`
      2. 复制输出的命令，在命令行执行
 
 ### 抓取看雪的博客
@@ -36,8 +36,9 @@
 （3）把自动生成的example.spec.js文件进行删除
     `rm tests/example.spec.js`
 
-（4）抓取前n页的博客标题
-    修改tests/kanxue.spec.js 获取页面的博客的标题和链接,运行脚本
-    `bundle exec ruby scripts/get_kanxue_blogs_using_playwright.rb`
+（4）抓取抓取博客列表
+    1. 修改run.rb 的内容，并运行
+    `$ bundle exec ruby run.rb`
+    2. 复制输出的命令，在命令行执
 
 
