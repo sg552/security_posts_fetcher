@@ -2,7 +2,7 @@
 source 'https://gems.ruby-china.com'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.1.0"
+#ruby "3.1.0"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.4"
@@ -11,10 +11,12 @@ gem 'open-uri'
 gem 'nokogiri'
 gem 'kaminari'
 gem 'json'
+gem 'redis-client'
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 
+gem 'mysql2'
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
 

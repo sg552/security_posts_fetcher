@@ -11,10 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2022_12_27_034615) do
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
-  create_table "blogs", force: :cascade do |t|
+  create_table "blogs", charset: "utf8mb3", force: :cascade do |t|
     t.string "title"
     t.text "content"
     t.string "author"
@@ -27,7 +24,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_27_034615) do
     t.integer "views"
   end
 
-  create_table "categories", force: :cascade do |t|
+  create_table "categories", charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.integer "blog_id"
     t.datetime "created_at", null: false
@@ -35,7 +32,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_27_034615) do
     t.integer "special_column_id"
   end
 
-  create_table "proxies", force: :cascade do |t|
+  create_table "proxies", charset: "utf8mb3", force: :cascade do |t|
     t.string "ip"
     t.integer "port"
     t.string "external_ip"
@@ -44,7 +41,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_27_034615) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "special_columns", force: :cascade do |t|
+  create_table "special_columns", charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "source_website"
     t.datetime "created_at", null: false
