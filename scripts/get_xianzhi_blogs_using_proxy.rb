@@ -52,13 +52,13 @@ end
 
 def retry_three_to_save_image image_src, image_name
   begin
-    retry_three_to_save_image
+    retry_to_save_image image_src, image_name
   rescue
     begin
-      retry_three_to_save_image
+      retry_to_save_image image_src, image_name
     rescue
       begin
-        retry_three_to_save_image
+        retry_to_save_image image_src, image_name
       rescue
         Rails.logger.info "============ curl image #{image_src} to loacl #{image_name} error"
       end
@@ -90,25 +90,21 @@ end
 
 def create_category blog_id, category_name
   if category_name.present?
-    xianzhi_anquanjishu_column = ["安全技术", "众测渗透", "漏洞分析", "WEB安全", "二进制安全", "移动安全", "IoT安全", "企业安全", "区块链安全", "密码学", "CTF", "安全工具", "资源分享", "技术讨论"].to_s
-    xianzhi_qingbao_column = ["情报", "先知情报"].to_s
-    xianzhi_gonggao_column = ["社区公告"].to_s
-    if category_name.include?("安全")
-      special_column_local = SpecialColumn.where('name = ? and source_website = ?', "安全技术", 'xianzhi').first
-      Rails.logger.info "==== id : #{special_column_local.id rescue ''}"
-    elsif category_name.include?("情报")
-      special_column_local = SpecialColumn.where('name = ? and source_website = ?', "先知情报", 'xianzhi').first
-      Rails.logger.info "==== id : #{special_column_local.id rescue ''}"
-    elsif category_name.include?("社区")
+    special_column_local = ''
+    if category_name.include?("社区")
       special_column_local = SpecialColumn.where('name = ? and source_website = ?', "社区公告", 'xianzhi').first
-      Rails.logger.info "==== id : #{special_column_local.id rescue ''}"
+    elsif category_name.include?('技术文章')
+      special_column_local = SpecialColumn.where('name = ? and source_website = ?', "技术文章", 'xianzhi').first
+    elsif category_name.include?('翻译文章')
+      special_column_local = SpecialColumn.where('name = ? and source_website = ?', "翻译文章", 'xianzhi').first
     end
+    Rails.logger.info "==== special_column_local id : #{special_column_local.id rescue ''}"
     category = Category.where('name = ? and blog_id = ?', category_name, blog_id).first
     Rails.logger.info "======  category: #{category.inspect}"
     if category.blank?
       Category.create name: category_name, blog_id: blog_id, special_column_id: special_column_local.id
     end
-    Rails.logger.info "======  category_name : #{category_name} special_column_local: #{special_column_local} special_column_local.id : #{special_column_local.id}"
+    Rails.logger.info "======  category_name : #{category_name} special_column_local name: #{special_column_local.name rescue ''}"
   end
 end
 
