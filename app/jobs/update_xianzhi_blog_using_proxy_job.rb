@@ -1,10 +1,9 @@
 require 'nokogiri'
 require 'rubygems'
 
-
 class UpdateXianzhiBlogUsingProxyJob < ApplicationJob
   queue_as :default
-  retry_on UpdateXianzhiBlogUsingProxyJob
+  retry_on UpdateXianzhiBlogUsingProxyJob, wait: 1.minutes, attempts: 5
 
   def save_images images
     image_remote_and_local_hash = {}
@@ -40,14 +39,14 @@ class UpdateXianzhiBlogUsingProxyJob < ApplicationJob
       if category.blank?
         Category.create name: category_name, blog_id: blog_id, special_column_id: special_column_local.id
       end
-      Rails.logger.info "======  category_name : #{category_name} special_column_local: #{special_column_local} special_column_local.id : #{special_column_local.id}"
+      Rails.logger.info "======  category_name : #{category_name} special_column_local.id : #{special_column_local.id}"
     end
   end
 
   def perform(args)
     Rails.logger = Logger.new("log/update_xianzhi_blog_using_proxy_job.log")
     blog = args[:blog]
-    Rails.logger.info "========== blog_url :#{blog.blog_url }"
+    Rails.logger.info "=====in job before update blog_url :#{blog.blog_url }"
     proxy = Proxy.where('expiration_time > ?', Time.now).all.shuffle.first
     if blog.blog_url.present? && blog.content.blank?
       command_get_page = %Q{curl -s --socks5 #{proxy.ip}:#{proxy.port} #{blog.blog_url}}

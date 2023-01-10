@@ -44,22 +44,20 @@ def run
     result = `#{command_get_page}`
     Rails.logger.info "=== result #{result} command_get_page: #{command_get_page}"
     doc = Nokogiri::HTML(result)
-    Rails.logger.info "============= doc is #{doc}"
+    Rails.logger.info "============= list_page doc is #{doc}"
     list_page_titles = doc.css('p[class="topic-summary"] a') rescue ''
     list_page_titles = retry_to_get_list_page xianzhi_url if list_page_titles.blank?
-    Rails.logger.info "============= list_page is present"
     doc.css('p[class="topic-summary"] a').each do |title|
       blog_url = "#{URL}#{title["href"]}" rescue ''
       blog_title = title.text rescue ''
       blog_local = Blog.where('blog_url = ?', blog_url).first
-      Rails.logger.info "=====blog_url: #{blog_url} blog_local: #{blog_local.inspect}========title: #{title} blog_title is #{blog_title}"
+      Rails.logger.info "===== blog_url: #{blog_url} blog_local: #{blog_local.inspect} ========title: #{title} blog_title is #{blog_title}"
       if blog_url.present? && blog_local.blank?
-        blog = Blog.create blog_url: blog_url, title: blog_title.strip, source_website: 'xianzhi'
-      elsif blog_local.present? && blog_local.content.blank?
-        UpdateKanxueBlogUsingProxyJob.perform_later blog: blog_local
+        Blog.create blog_url: blog_url, title: blog_title.strip, source_website: 'xianzhi'
+        sleep SLEEP
       end
-      sleep SLEEP
     end
+    sleep SLEEP
   end
   Rails.logger.info "====after created ===#{ENV['FROM']}_#{ENV['TO']}======== end"
 end
