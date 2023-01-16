@@ -29,6 +29,9 @@
 
 （1）运行脚本
     `$ ./get_blogs_regular.rb`
+（2）运行redis
+    `$ ./get_blogs_regular.rb`
+     `redis-server`
 
 ### 抓取看雪的博客
 
