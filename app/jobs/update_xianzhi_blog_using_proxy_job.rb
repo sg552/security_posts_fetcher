@@ -24,13 +24,11 @@ class UpdateXianzhiBlogUsingProxyJob < ApplicationJob
 
   def create_category blog_id, category_name
     if category_name.present?
-      xianzhi_qingbao_column = ["情报", "先知情报"].to_s
-      xianzhi_gonggao_column = ["社区公告"].to_s
       special_column_local = ''
       if category_name.include?("技术")
         special_column_local = SpecialColumn.where('name = ? and source_website = ?', "技术文章", 'xianzhi').first
       elsif category_name.include?("社区")
-        special_column_local = SpecialColumn.where('name = ? and source_website = ?', "社区公告", 'xianzhi').first
+        special_column_local = SpecialColumn.where('name = ? and source_website = ?', "社区板块", 'xianzhi').first
       end
       Rails.logger.info "====step2.1 special_column_local_id : #{special_column_local.id rescue ''}"
       category = Category.where('name = ? and blog_id = ?', category_name, blog_id).first

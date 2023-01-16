@@ -1,6 +1,6 @@
 ### 抓取先知的博客
 
-步骤
+（一）抓取所有先知社区博客的步骤
 
 （1）创建专栏的数据
     `$ bundle exec ruby scripts/create_special_column.rb`
@@ -23,6 +23,12 @@
      1. 修改run.rb 的内容，并运行
      `$ bundle exec ruby run.rb`
      2. 复制输出的命令，在命令行执行
+
+
+（二）自动更新先知社区的博客
+
+（1）运行脚本
+    `$ ./get_blogs_regular.rb`
 
 ### 抓取看雪的博客
 

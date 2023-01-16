@@ -9,8 +9,7 @@ require 'json'
 Rails.logger = Logger.new("log/create_proxies.log")
 
 xianzhi_shequ_column = ["社区板块"]
-xianzhi_gonggao_column = ["社区公告"]
-xianzhi_jishu_wenzhang_column = ["技术文章"," 翻译文章"]
+xianzhi_jishu_wenzhang_column = ["技术文章"]
 
 xianzhi_special_columns = xianzhi_+ xianzhi_gonggao_column + xianzhi_jishu_wenzhang_column
 xianzhi_special_columns.each do |name|
